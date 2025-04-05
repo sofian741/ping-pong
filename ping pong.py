@@ -18,19 +18,19 @@ class GameSprite(sprite.Sprite):
         self.speed = speed
 
     def reset(self):
-        draw.rect(window,BACKGROUND,self.rect)
+
         window.blit(self.image,(self.rect.x, self.rect.y))
 
 class Player(GameSprite):
     def update_r(self):
-        draw.rect(window,BACKGROUND,self.rect)
+        
         keys = key.get_pressed()
         if keys[K_UP] and self.rect.y > 5:
             self.rect.y -= self.speed
         if keys[K_DOWN] and self.rect.y < 420:
             self.rect.y += self.speed
     def update_l(self):
-        draw.rect(window,BACKGROUND,self.rect)
+        
         keys = key.get_pressed()
         if keys[K_w] and self.rect.y > 5:
             self.rect.y -= self.speed
@@ -41,6 +41,14 @@ racket_r = Player("racket.png",30,80,win_width - 40,200,3)
 racket_l = Player("racket.png",30,80,10,200,3)
 ball = GameSprite("tenis_ball.png",50,50,325,225,0)
 
+font.init()
+font_1 = font.SysFont("Arial",65,True)
+win_r = font_1.render("Right Player WON",True,(180,0,0))
+win_l = font_1.render("Left Player WON",True,(180,0,0))
+
+speed_x = 3
+speed_y = 3
+
 finish = False
 run = True
 while run:
@@ -49,8 +57,26 @@ while run:
             run = False
     
     if not finish:
+        window.fill(BACKGROUND)
         racket_r.update_r()
         racket_l.update_l()
+
+        ball.rect.x += speed_x
+        ball.rect.y += speed_y
+
+        if ball.rect.y > 450 or ball.rect.y <0:
+            speed_y *= -1
+
+        if sprite.collide_rect(ball , racket_r) or sprite.collide_rect(ball,racket_l):
+            speed_x *= -1
+
+        if ball.rect.x > 650:
+            window.blit(win_l,(125,225))
+            finish = True
+
+        if ball.rect.x < 0:
+            window.blit(win_r,(125,225))
+            finish = True
 
         racket_r.reset()
         racket_l.reset()
